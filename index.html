@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emily — Photographer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --accent: #c8a96e;
+    --text: #e8e8e8;
+    --muted: #888;
+    --border: rgba(255,255,255,0.08);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 48px;
+    background: linear-gradient(to bottom, rgba(13,13,13,0.95), transparent);
+  }
+
+  .logo {
+    font-size: 1.1rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 80px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, rgba(13,13,13,0.92) 30%, rgba(13,13,13,0.3) 100%),
+      url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=1600&q=80') center/cover no-repeat;
+  }
+
+  .hero-content { position: relative; max-width: 680px; }
+
+  .hero-eyebrow {
+    font-family: 'Arial', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 400;
+    line-height: 1.05;
+    margin-bottom: 24px;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 420px;
+    margin-bottom: 40px;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 14px 36px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    text-decoration: none;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: background 0.3s, color 0.3s;
+  }
+  .btn:hover { background: var(--accent); color: var(--bg); }
+
+  /* SECTION COMMON */
+  section { padding: 100px 48px; }
+  .section-label {
+    font-family: 'Arial', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 60px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  /* GALLERY */
+  #gallery { background: var(--surface); }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .gallery-item {
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease, filter 0.4s;
+    filter: grayscale(20%);
+  }
+
+  .gallery-item:hover img { transform: scale(1.05); filter: grayscale(0%); }
+
+  .gallery-item-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(13,13,13,0.5);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .gallery-item:hover .gallery-item-overlay { opacity: 1; }
+  .gallery-item-overlay span {
+    color: white;
+    font-size: 2rem;
+  }
+
+  /* VIDEO */
+  #video { background: var(--bg); }
+
+  .video-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .video-container iframe,
+  .video-container video {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: none;
+  }
+
+  .video-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: var(--muted);
+  }
+
+  .play-icon {
+    width: 72px;
+    height: 72px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .play-icon:hover { background: var(--accent); }
+  .play-icon svg { fill: var(--accent); margin-left: 4px; transition: fill 0.3s; }
+  .play-icon:hover svg { fill: var(--bg); }
+
+  .video-caption {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-family: 'Arial', sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  /* ABOUT */
+  #about { background: var(--surface); }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1100px;
+  }
+
+  .about-img {
+    aspect-ratio: 4/5;
+    overflow: hidden;
+  }
+  .about-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(30%);
+  }
+
+  .about-text h2 {
+    font-size: 2.5rem;
+    font-weight: 400;
+    margin-bottom: 24px;
+    line-height: 1.2;
+  }
+
+  .about-text p {
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+  }
+
+  .about-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .stat-num {
+    font-size: 2.2rem;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-family: 'Arial', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* CONTACT */
+  #contact { background: var(--bg); }
+
+  .contact-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    max-width: 1000px;
+  }
+
+  .contact-info h2 {
+    font-size: 2.2rem;
+    font-weight: 400;
+    margin-bottom: 24px;
+  }
+
+  .contact-info p { color: var(--muted); font-size: 0.95rem; }
+
+  .contact-links {
+    margin-top: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text);
+    text-decoration: none;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+  }
+  .contact-link:hover { color: var(--accent); }
+  .contact-link .icon { color: var(--accent); font-style: normal; width: 20px; }
+
+  form { display: flex; flex-direction: column; gap: 16px; }
+
+  input, textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 14px 18px;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  input:focus, textarea:focus { border-color: var(--accent); }
+  textarea { min-height: 120px; resize: vertical; }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+
+  .btn-submit {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 16px;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .btn-submit:hover { opacity: 0.85; }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* LIGHTBOX */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .lightbox.active { display: flex; }
+  .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; }
+  .lightbox-close {
+    position: absolute;
+    top: 24px; right: 32px;
+    font-size: 2rem;
+    color: var(--muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    line-height: 1;
+  }
+  .lightbox-close:hover { color: var(--text); }
+
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 60px 24px; }
+    section { padding: 70px 24px; }
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    .about-grid, .contact-inner { grid-template-columns: 1fr; gap: 40px; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">Emily</a>
+  <ul class="nav-links">
+    <li><a href="#gallery">Портфолио</a></li>
+    <li><a href="#video">Видео</a></li>
+    <li><a href="#about">Обо мне</a></li>
+    <li><a href="#contact">Контакт</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Фотограф · Москва</p>
+    <h1>Эмилия<br>Сорокина</h1>
+    <p>Запечатляю моменты, которые невозможно повторить. Портрет, репортаж, арт.</p>
+    <a href="#gallery" class="btn">Смотреть работы</a>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="section-label">Портфолио</div>
+  <div class="gallery-grid">
+    <div class="gallery-item" onclick="openLightbox(this)">
+      <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&q=80" alt="Портрет 1">
+      <div class="gallery-item-overlay"><span>+</span></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(this)">
+      <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80" alt="Портрет 2">
+      <div class="gallery-item-overlay"><span>+</span></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(this)">
+      <img src="https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=600&q=80" alt="Портрет 3">
+      <div class="gallery-item-overlay"><span>+</span></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(this)">
+      <img src="https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=600&q=80" alt="Портрет 4">
+      <div class="gallery-item-overlay"><span>+</span></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(this)">
+      <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80" alt="Портрет 5">
+      <div class="gallery-item-overlay"><span>+</span></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(this)">
+      <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80" alt="Портрет 6">
+      <div class="gallery-item-overlay"><span>+</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO -->
+<section id="video">
+  <div class="section-label">Видео</div>
+  <div class="video-wrapper">
+    <div class="video-container" id="videoContainer">
+      <!-- Замените src на ссылку YouTube или путь к видеофайлу -->
+      <!-- Для YouTube: <iframe src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe> -->
+      <!-- Для локального файла: <video src="your-video.mp4" controls></video> -->
+      <div class="video-placeholder" id="videoPlaceholder">
+        <div class="play-icon" onclick="loadVideo()">
+          <svg width="24" height="24" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <p>Showreel 2024</p>
+      </div>
+    </div>
+    <p class="video-caption">Нажмите, чтобы воспроизвести · или вставьте ссылку на YouTube ниже</p>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <input type="text" id="videoUrl" placeholder="https://youtube.com/watch?v=..." style="flex:1;background:#161616;border:1px solid rgba(255,255,255,0.08);color:#e8e8e8;padding:12px 16px;font-family:Arial,sans-serif;font-size:0.85rem;outline:none;">
+      <button onclick="embedVideo()" style="background:#c8a96e;color:#0d0d0d;border:none;padding:12px 24px;font-family:Arial,sans-serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">Вставить</button>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">Обо мне</div>
+  <div class="about-grid">
+    <div class="about-img">
+      <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=80" alt="Эмилия">
+    </div>
+    <div class="about-text">
+      <h2>Свет.<br>Момент.<br>История.</h2>
+      <p>Я — фотограф с 7-летним опытом, специализируюсь на портретной и репортажной съёмке. Моя работа — это не просто фотографии, это истории людей, рассказанные через свет и тень.</p>
+      <p>Работала с брендами, журналами и просто удивительными людьми по всей России и Европе. Верю, что каждый кадр — это диалог.</p>
+      <div class="about-stats">
+        <div>
+          <span class="stat-num">7+</span>
+          <span class="stat-label">Лет опыта</span>
+        </div>
+        <div>
+          <span class="stat-num">400+</span>
+          <span class="stat-label">Проектов</span>
+        </div>
+        <div>
+          <span class="stat-num">12</span>
+          <span class="stat-label">Стран</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">Контакт</div>
+  <div class="contact-inner">
+    <div class="contact-info">
+      <h2>Давайте создадим что-то вместе</h2>
+      <p>Открыта к новым проектам, коллаборациям и интересным идеям. Напишите мне — отвечаю в течение дня.</p>
+      <div class="contact-links">
+        <a href="mailto:hello@emily.photo" class="contact-link">
+          <i class="icon">✉</i> hello@emily.photo
+        </a>
+        <a href="tel:+79991234567" class="contact-link">
+          <i class="icon">☎</i> +7 999 123-45-67
+        </a>
+        <a href="https://instagram.com/" target="_blank" class="contact-link">
+          <i class="icon">◈</i> @emily.photo
+        </a>
+      </div>
+    </div>
+    <form onsubmit="handleSubmit(event)">
+      <input type="text" placeholder="Ваше имя" required>
+      <input type="email" placeholder="Email" required>
+      <textarea placeholder="Расскажите о вашем проекте..."></textarea>
+      <button type="submit" class="btn-submit">Отправить</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <span>© 2024 Эмилия Сорокина</span>
+  <span>Москва · Россия</span>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <img src="" alt="" id="lightboxImg">
+</div>
+
+<script>
+  function openLightbox(el) {
+    const src = el.querySelector('img').src;
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox(e) {
+    if (!e || e.target !== document.getElementById('lightboxImg')) {
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  function loadVideo() {
+    const url = document.getElementById('videoUrl').value.trim();
+    if (url) { embedVideo(); return; }
+    alert('Вставьте ссылку на YouTube или путь к видеофайлу в поле ниже.');
+  }
+
+  function embedVideo() {
+    const raw = document.getElementById('videoUrl').value.trim();
+    if (!raw) return;
+    const container = document.getElementById('videoContainer');
+    let embedUrl = '';
+
+    const ytMatch = raw.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+    if (ytMatch) {
+      embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`;
+      container.innerHTML = `<iframe src="${embedUrl}" allowfullscreen allow="autoplay"></iframe>`;
+    } else if (raw.match(/\.(mp4|webm|ogg)$/i)) {
+      container.innerHTML = `<video src="${raw}" controls autoplay></video>`;
+    } else {
+      alert('Вставьте ссылку YouTube или путь к видеофайлу (.mp4, .webm)');
+    }
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.btn-submit');
+    btn.textContent = 'Отправлено ✓';
+    btn.style.background = '#4a7c59';
+    setTimeout(() => {
+      btn.textContent = 'Отправить';
+      btn.style.background = '';
+      e.target.reset();
+    }, 3000);
+  }
+</script>
+</body>
+</html>
